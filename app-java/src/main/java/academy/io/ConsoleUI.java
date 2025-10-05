@@ -65,6 +65,12 @@ public final class ConsoleUI {
 
             char letter = line.charAt(0);
 
+            // Проверка: только английские буквы
+            if (!Character.isLetter(letter) || (letter < 'A' || (letter > 'Z' && letter < 'a') || letter > 'z')) {
+                System.out.println("Please, enter only english letters (A–Z).");
+                continue;
+            }
+
             if (state.arlreadyGuessed((letter))) {
                 System.out.println("(!!!) You already guessed this letter. Try another one.");
                 continue;
