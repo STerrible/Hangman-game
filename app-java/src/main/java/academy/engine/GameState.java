@@ -10,6 +10,9 @@ public class GameState {
     private int wrongAttempts = 0;
 
     public GameState(String answer, int maxAttempts) {
+        if (answer == null || answer.isEmpty()) {
+            throw new IllegalArgumentException("Answer must nut be null or empty");
+        }
         this.answer = answer;
         this.maxAttempts = maxAttempts;
     }
@@ -35,17 +38,23 @@ public class GameState {
         return maxAttempts - wrongAttempts;
     }
 
-    public void guess(char c) {
+    public boolean guess(char c) {
         char lower = Character.toLowerCase(c);
-        if (guessed.contains(lower)) return;
+        if (guessed.contains(lower)) return false;
         guessed.add(lower);
-        boolean any = answer.toLowerCase().indexOf(lower) >= 0;
-        if (!any) wrongAttempts++;
+        boolean correct = answer.toLowerCase().indexOf(lower) >= 0;
+        if (!correct) wrongAttempts++;
+        return correct;
     }
     public int wrongAttempts() {
         return wrongAttempts;
     }
-    public boolean arlreadyGuessed(char c) {
+    public boolean alreadyGuessed(char c) {
         return guessed.contains(Character.toLowerCase(c));
     }
+
+    public int getMaxAttempts() {
+        return maxAttempts;
+    }
+
 }

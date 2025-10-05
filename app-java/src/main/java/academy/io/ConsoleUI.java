@@ -1,5 +1,6 @@
 package academy.io;
 
+import academy.GameSession;
 import academy.engine.Difficulty;
 import academy.engine.WordRepository.Category;
 import academy.engine.GameState;
@@ -24,13 +25,13 @@ public final class ConsoleUI {
         };
 
         WordRepository.Pick pick = WordRepository.pickRandom(category, difficulty);
+        GameSession session = new GameSession(pick, maxAttempts);
+
         String secret = pick.word();
-        String hint = pick.hint();
         System.out.printf("Category: %s, Difficulty: %s, word length %d%n", pick.category(), pick.difficulty(), secret.length());
 
-        GameState state = new GameState(secret, maxAttempts);
-
-        boolean hintUsed = false;
+        GameState state = session.state();
+        boolean localHintShown = false;
 
         while (!state.isWon() && !state.isLost()) {
             System.out.println("Word: " + state.masked());
@@ -48,11 +49,16 @@ public final class ConsoleUI {
 
             // обработка команды hint (без учёта регистра)
             if (line.equalsIgnoreCase("hint")) {
-                if (hintUsed) {
+                if (session.isHintUsed()) {
                     System.out.println("Подсказка уже использована.");
                 } else {
-                    System.out.println("Подсказка: " + hint);
-                    hintUsed = true;
+                    String hint = session.useHint();
+                    if (hint != null) {
+                        System.out.println("Hint: " + hint);
+                        localHintShown = true;
+                    } else {
+                        System.out.println("No hint available");
+                    }
                 }
                 // подсказка не тратит попытку, переходим к следующей итерации
                 continue;
@@ -71,7 +77,7 @@ public final class ConsoleUI {
                 continue;
             }
 
-            if (state.arlreadyGuessed((letter))) {
+            if (state.alreadyGuessed((letter))) {
                 System.out.println("(!!!) You already guessed this letter. Try another one.");
                 continue;
             }
@@ -79,7 +85,7 @@ public final class ConsoleUI {
             state.guess(letter);
         }
 
-        System.out.println("Final: " + state.masked());
+        System.out.println("Final: " + state.masked() + " (answer: " + session.secret() + ")");
         System.out.println(HangmanRenderer.render(state.wrongAttempts(), difficulty));
         if (state.isWon()) System.out.println("You won!");
         else System.out.println("You lost!");
@@ -101,7 +107,7 @@ public final class ConsoleUI {
         }
     }
 
-    private static Difficulty promptDifficulty(Scanner sc) {
+        private static Difficulty promptDifficulty(Scanner sc) {
         System.out.println("Choose difficulty: 1 or EASY, 2 or MEDIUM, 3 or HARD (or press enter for random):" + "\n");
         String input = sc.nextLine().trim().toUpperCase();
         return switch (input) {
@@ -118,4 +124,37 @@ public final class ConsoleUI {
             }
         };
     }
+    public static boolean processInputLine(GameSession session, String line) {
+        if (line == null || line.isEmpty()) return false;
+
+        line = line.trim();
+
+        // hint
+        if (line.equalsIgnoreCase("hint")) {
+            if (session.isHintUsed()) return false; // уже использована
+            System.out.println("Hint: " + session.useHint());
+            return false;
+        }
+
+        // проверка на длину
+        if (line.length() != 1) return false;
+
+        char letter = line.charAt(0);
+
+        // проверка, что это английская буква
+        if (!Character.isLetter(letter) || !Character.isAlphabetic(letter)) return false;
+
+        GameState state = session.state();
+
+        // проверка, что буква уже была угадана
+        if (state.alreadyGuessed(letter)) {
+            System.out.println("You already guessed this letter. Try another one.");
+            return false;
+        }
+
+        // угадываем букву
+        state.guess(letter);
+        return true;
+    }
+
 }
