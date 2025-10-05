@@ -73,7 +73,7 @@ public class Application implements Runnable {
             LOGGER.atInfo().log("Interactive mode enabled");
             // тут будут ConsoleUI и GameEngine
 
-            ConsoleUI.runInteractive(config.words() != null && config.words().length > 0 ? config.words()[0] : "example");
+            ConsoleUI.runInteractive();
         }
     }
 
