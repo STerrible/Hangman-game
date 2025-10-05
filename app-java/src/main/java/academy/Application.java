@@ -56,17 +56,15 @@ public class Application implements Runnable {
         if (IS_TESTING_MODE.test(config.words())) {
             LOGGER.atInfo().log("Non-interactive testing mode enabled");
             // Используй вызов движка игры вместо хардкода тестовых данных
-            var word = config.words()[0];
-            var userInput = config.words()[1];
-            var result = TEST_CASES_DUMMY.getOrDefault(word, UNKNOWN_TEST_WORD).stream()
-                .filter(entry -> entry.getKey().test(userInput))
-                .findAny()
-                .map(Map.Entry::getValue)
-                .map(Supplier::get)
-                .orElse("Unknown answer");
-            System.out.println(result);
+            var secret = config.words()[0];
+            var attempt = config.words()[1];
+
+            //реализация тестового режима
+            String out = TestModeRunner.run(secret, attempt);
+            System.out.println(out);
         } else {
             LOGGER.atInfo().log("Interactive mode enabled");
+            // тут будут ConsoleUI и GameEngine
         }
     }
 
@@ -81,5 +79,4 @@ public class Application implements Runnable {
             throw new UncheckedIOException(e);
         }
     }
-
 }
