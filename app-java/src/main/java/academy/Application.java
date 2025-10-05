@@ -1,5 +1,6 @@
 package academy;
 
+import academy.io.ConsoleUI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -65,6 +66,16 @@ public class Application implements Runnable {
         } else {
             LOGGER.atInfo().log("Interactive mode enabled");
             // тут будут ConsoleUI и GameEngine
+            String secret;
+            int maxAttempts = 6;
+
+            if (config.words() != null && config.words().length > 0) {
+                secret = config.words()[0];
+            } else {
+                secret = "academy";
+            }
+
+            ConsoleUI.runInteractive("твое_секретное_слово", maxAttempts);
         }
     }
 

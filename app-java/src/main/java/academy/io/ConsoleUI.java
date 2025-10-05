@@ -13,7 +13,7 @@ public final class ConsoleUI {
 
         while (!state.isWon() && !state.isLost()) {
             System.out.println("Word: " + state.masked());
-            System.out.println(HangmanRenderer.render(state.remainingAttempts()));
+            System.out.println(HangmanRenderer.render(state.wrongAttempts()));
             System.out.println("Remaining attempts: " + state.remainingAttempts());
             System.out.print("Enter a letter: ");
             String line = sc.nextLine().trim();
@@ -26,6 +26,7 @@ public final class ConsoleUI {
         }
 
         System.out.println("Final: " + state.masked());
+        System.out.println(HangmanRenderer.render(state.wrongAttempts()));
         if (state.isWon()) System.out.println("You won!");
         else System.out.println("You lost!");
     }

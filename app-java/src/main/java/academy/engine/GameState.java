@@ -42,4 +42,7 @@ public class GameState {
         boolean any = answer.toLowerCase().indexOf(lower) >= 0;
         if (!any) wrongAttempts++;
     }
+    public int wrongAttempts() {
+        return wrongAttempts;
+    }
 }
