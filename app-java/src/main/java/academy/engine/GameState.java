@@ -45,4 +45,7 @@ public class GameState {
     public int wrongAttempts() {
         return wrongAttempts;
     }
+    public boolean arlreadyGuessed(char c) {
+        return guessed.contains(Character.toLowerCase(c));
+    }
 }

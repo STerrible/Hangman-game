@@ -1,5 +1,6 @@
 package academy;
 
+import academy.engine.Difficulty;
 import academy.io.ConsoleUI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -51,6 +52,11 @@ public class Application implements Runnable {
     @Override
     public void run() {
         AppConfig config = loadConfig();
+
+        // если пользователь не указал сложность то выбираем случайную
+        if (config.difficulty() == null) {
+            config = new AppConfig(config.fontSize(), config.words(), Difficulty.random());
+        }
         LOGGER.atInfo().addKeyValue("config", config).log("Config content");
 
         // ... logic
@@ -66,22 +72,14 @@ public class Application implements Runnable {
         } else {
             LOGGER.atInfo().log("Interactive mode enabled");
             // тут будут ConsoleUI и GameEngine
-            String secret;
-            int maxAttempts = 6;
 
-            if (config.words() != null && config.words().length > 0) {
-                secret = config.words()[0];
-            } else {
-                secret = "academy";
-            }
-
-            ConsoleUI.runInteractive("твое_секретное_слово", maxAttempts);
+            ConsoleUI.runInteractive(config.words() != null && config.words().length > 0 ? config.words()[0] : "example");
         }
     }
 
     private AppConfig loadConfig() {
         // fill with cli options
-        if (configPath == null) return new AppConfig(fontSize, words);
+        if (configPath == null) return new AppConfig(fontSize, words, null);
 
         // use config file if provided
         try {
