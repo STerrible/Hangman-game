@@ -35,6 +35,6 @@ public final class TestModeRunner {
 
         // POS только при полном совпадении слов (без учёта регистра и пробелов по краям)
         String result = sLow.equals(aLow) ? "POS" : "NEG";
-        return masked.toString() + ";" + result;
+        return masked + ";" + result;
     }
 }
