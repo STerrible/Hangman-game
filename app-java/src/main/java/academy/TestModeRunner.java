@@ -32,8 +32,9 @@ public final class TestModeRunner {
             masked.append(attemptSet.contains(low) ? orig : '*');
         }
 
-        // POS если слова совпали НЕ целиком или целиком (без учёта регистра и пробелов по краям)
-        String result = masked.indexOf("*") < 0 ? "POS" : "NEG";
-        return masked + ";" + result;
+
+        // POS только при полном совпадении слов (без учёта регистра и пробелов по краям)
+        String result = sLow.equals(aLow) ? "POS" : "NEG";
+        return masked.toString() + ";" + result;
     }
 }
