@@ -32,8 +32,7 @@ public final class TestModeRunner {
             masked.append(attemptSet.contains(low) ? orig : '*');
         }
 
-
-        // POS только при полном совпадении слов (без учёта регистра и пробелов по краям)
+        // POS только при полном совпадении слов (без учёта регистра и пробелов по краям), NEG в любом другом случае
         String result = sLow.equals(aLow) ? "POS" : "NEG";
         return masked + ";" + result;
     }
