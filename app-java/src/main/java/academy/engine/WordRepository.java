@@ -14,7 +14,7 @@ public final class WordRepository {
 
     public enum Category { IT, ANIMALS, FRUITS }
 
-    private static final Random RNG = new Random();
+    private static final Random random = new Random();
 
     private static final Map<Category, List<Map.Entry<String, String>>> EASY = Map.of(
         Category.IT, List.of(
@@ -144,19 +144,19 @@ public final class WordRepository {
             case HARD -> HARD.get(category);
         };
         if (list == null || list.isEmpty()) throw new IllegalArgumentException("Unknown category/difficulty");
-        Map.Entry<String, String> entry = list.get(RNG.nextInt(list.size()));
+        Map.Entry<String, String> entry = list.get(random.nextInt(list.size()));
         return new Pick(entry.getKey(), entry.getValue(), difficulty, category);
     }
 
-    public static Pick pickRandom(Difficulty difficulty) {
-        Category[] cats = Category.values();
-        Category cat = cats[RNG.nextInt(cats.length)];
-        return pickRandom(cat, difficulty);
-    }
+//    public static Pick pickRandom(Difficulty difficulty) {
+//        Category[] cats = Category.values();
+//        Category cat = cats[random.nextInt(cats.length)];
+//        return pickRandom(cat, difficulty);
+//    }
 
-    public static Pick pickRandomAny() {
-        Difficulty[] diffs = Difficulty.values();
-        Difficulty diff = diffs[RNG.nextInt(diffs.length)];
-        return pickRandom(diff);
-    }
+//    public static Pick pickRandomAny() {
+//        Difficulty[] diffs = Difficulty.values();
+//        Difficulty diff = diffs[random.nextInt(diffs.length)];
+//        return pickRandom(diff);
+//    }
 }

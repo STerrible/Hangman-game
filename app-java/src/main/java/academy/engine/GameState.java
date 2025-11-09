@@ -10,10 +10,13 @@ public class GameState {
     private int wrongAttempts = 0;
 
     public GameState(String answer, int maxAttempts) {
-        if (answer == null || answer.isEmpty()) {
-            throw new IllegalArgumentException("Answer must nut be null or empty");
+        if (answer == null || answer.trim().isEmpty()) {
+            throw new IllegalArgumentException("Answer must not be null or empty");
         }
-        this.answer = answer;
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException("maxAttempts must be > 0");
+        }
+        this.answer = answer.trim().toLowerCase();
         this.maxAttempts = maxAttempts;
     }
 
@@ -38,13 +41,16 @@ public class GameState {
         return maxAttempts - wrongAttempts;
     }
 
-    public boolean guess(char c) {
+    public GuessResult guess(char c) {
         char lower = Character.toLowerCase(c);
-        if (guessed.contains(lower)) return false;
+        if (guessed.contains(lower)) return GuessResult.ALREADY_GUESSED;
         guessed.add(lower);
-        boolean correct = answer.toLowerCase().indexOf(lower) >= 0;
-        if (!correct) wrongAttempts++;
-        return correct;
+        if (answer.indexOf(lower) >= 0) {
+            return GuessResult.HIT;
+        } else {
+            wrongAttempts++;
+            return GuessResult.MISS;
+        }
     }
     public int wrongAttempts() {
         return wrongAttempts;

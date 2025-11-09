@@ -81,14 +81,13 @@ public final class HangmanRenderer {
     private HangmanRenderer() {}
 
     public static String render(int wrongAttempts, Difficulty difficulty) {
-        int offset;
-        switch (difficulty) {
-            case EASY -> offset = 0;   // начинаем с нулевого этапа
-            case MEDIUM -> offset = 2; // средняя сложность — этапы 4–10
-            case HARD -> offset = 4;   // самая сложная — этапы 6–10
-            default -> offset = 0;
+        int baseStage = difficulty.stageOffset(); // теперь из enum
+        int stageIndex = baseStage + wrongAttempts;
+
+        if (stageIndex >= STAGES.length) {
+            stageIndex = STAGES.length - 1;
         }
-        int idx = Math.min(offset + wrongAttempts, STAGES.length - 1);
-        return "\n" + STAGES[idx];
+
+        return "\n" + STAGES[stageIndex];
     }
 }
