@@ -1,22 +1,20 @@
 package academy;
 
+import academy.engine.Difficulty;
+import academy.io.ConsoleUI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Map;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import static academy.AcceptanceTestExample.TEST_CASES_DUMMY;
-import static academy.AcceptanceTestExample.UNKNOWN_TEST_WORD;
 import static java.util.Objects.nonNull;
 
 @Command(name = "Application Example", version = "Example 1.0", mixinStandardHelpOptions = true)
@@ -50,36 +48,50 @@ public class Application implements Runnable {
     @Override
     public void run() {
         AppConfig config = loadConfig();
+
+        // если передано ровно 1 слово — это ошибка запуска
+        if (words != null && words.length == 1) {
+            throw new picocli.CommandLine.ParameterException(
+                new picocli.CommandLine(this),
+                "Non-interactive mode expects exactly two args: <secret> <attempt>. " +
+                    "Run without args for interactive mode."
+            );
+        }
+        if (words != null && words.length > 2) {
+            throw new picocli.CommandLine.ParameterException(
+                new picocli.CommandLine(this), "Non-interactive mode expects exactly two args: <secret> <attempt>, no more");}
+
+        // если пользователь не указал сложность, то выбираем случайную
+        if (config.difficulty() == null) {
+            config = new AppConfig(config.fontSize(), config.words(), Difficulty.random());
+        }
         LOGGER.atInfo().addKeyValue("config", config).log("Config content");
 
         // ... logic
         if (IS_TESTING_MODE.test(config.words())) {
             LOGGER.atInfo().log("Non-interactive testing mode enabled");
-            // Используй вызов движка игры вместо хардкода тестовых данных
-            var word = config.words()[0];
-            var userInput = config.words()[1];
-            var result = TEST_CASES_DUMMY.getOrDefault(word, UNKNOWN_TEST_WORD).stream()
-                .filter(entry -> entry.getKey().test(userInput))
-                .findAny()
-                .map(Map.Entry::getValue)
-                .map(Supplier::get)
-                .orElse("Unknown answer");
-            System.out.println(result);
+            // Использование вызова движка игры вместо hardcode тестовых данных
+            var secret = config.words()[0];
+            var attempt = config.words()[1];
+
+            //реализация тестового режима
+            String out = TestModeRunner.run(secret, attempt);
+            System.out.println(out);
         } else {
             LOGGER.atInfo().log("Interactive mode enabled");
+            // тут будут ConsoleUI и GameEngine
+
+            ConsoleUI.runInteractive();
         }
     }
 
     private AppConfig loadConfig() {
-        // fill with cli options
-        if (configPath == null) return new AppConfig(fontSize, words);
+        if (configPath == null) return new AppConfig(fontSize, words, null);
 
-        // use config file if provided
         try {
             return YAML_READER.readValue(configPath, AppConfig.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
-
 }
